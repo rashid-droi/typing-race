@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://typing-race.local/schemas/ws-message.json",
+  "title": "WebSocketMessage",
+  "description": "Shared contract for client/server WebSocket payloads.",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["type", "payload"],
+      "properties": {
+        "type": { "const": "ping" },
+        "payload": { "type": "object", "additionalProperties": false }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["type", "payload"],
+      "properties": {
+        "type": { "const": "pong" },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "ts": { "type": "string", "format": "date-time" }
+          },
+          "required": ["ts"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["type", "payload"],
+      "properties": {
+        "type": { "const": "echo" },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "message": { "type": "string" }
+          },
+          "required": ["message"],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}

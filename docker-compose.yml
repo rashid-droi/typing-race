@@ -1,0 +1,13 @@
+# Optional services for local Typing Race development.
+# Game + admin work without Docker; Redis enables leaderboard pub/sub fan-out.
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+volumes:
+  redis_data:

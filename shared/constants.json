@@ -1,0 +1,7 @@
+{
+  "apiVersion": "v1",
+  "restPrefix": "/api/v1",
+  "healthPath": "/health",
+  "websocketPath": "/ws",
+  "multiplayerWebsocketPathTemplate": "/ws/{room_id}"
+}
