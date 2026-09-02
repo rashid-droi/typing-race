@@ -1,0 +1,172 @@
+/* Synthwave arcade highway — reference-style perspective race */
+
+.arcade-race {
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 2px solid #2a1840;
+  background: #1a1030;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.arcade-race--live {
+  box-shadow: 0 0 20px rgba(255, 100, 80, 0.15), 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+
+.arcade-race__scene {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 5 / 4;
+  min-height: 16rem;
+  max-height: 28rem;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .arcade-race__scene {
+    min-height: 20rem;
+    max-height: 34rem;
+  }
+}
+
+.arcade-race__road-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.arcade-race__cars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.arcade-race__empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.arcade-race__car {
+  position: absolute;
+  width: clamp(4.5rem, 18vw, 7.5rem);
+  transform: translate(-50%, -50%) scale(var(--car-scale, 1));
+  transition:
+    top 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+    left 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: top, left, transform;
+}
+
+.arcade-race__car--player {
+  width: clamp(5.5rem, 22vw, 9rem);
+  transition: top 50ms linear, left 50ms linear;
+  z-index: 300 !important;
+}
+
+.arcade-race__car-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+}
+
+.arcade-race__car--player .arcade-race__car-svg {
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
+}
+
+.arcade-race__player-label {
+  display: block;
+  margin-top: 0.15rem;
+  text-align: center;
+  font-size: 0.65rem;
+  font-style: italic;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.arcade-race__hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.5rem 0.65rem;
+  border-top: 1px solid #3d2855;
+  background: linear-gradient(180deg, #2a1840 0%, #1a1030 100%);
+}
+
+.arcade-race__hud-row {
+  display: flex;
+  flex: 1 1 calc(50% - 0.35rem);
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 8rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.25rem;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.arcade-race__hud-row.is-me {
+  background: rgba(245, 197, 24, 0.12);
+  border: 1px solid rgba(245, 197, 24, 0.25);
+}
+
+.arcade-race__hud-rank {
+  font-family: ui-monospace, monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #4dd0e1;
+}
+
+.arcade-race__hud-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.arcade-race__hud-pct {
+  font-family: ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #4dd0e1;
+}
+
+.race-track-wrap {
+  width: 100%;
+}
+
+.arcade-race-car--moving {
+  animation: arcade-car-vibrate 0.12s ease-in-out infinite;
+}
+
+@keyframes arcade-car-vibrate {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+}
+
+.arcade-car-taillight {
+  animation: arcade-tail-pulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes arcade-tail-pulse {
+  from { opacity: 0.85; }
+  to { opacity: 1; }
+}
+
+.arcade-car-tail-glow {
+  animation: arcade-tail-glow 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes arcade-tail-glow {
+  from { opacity: 0.6; }
+  to { opacity: 0.9; }
+}

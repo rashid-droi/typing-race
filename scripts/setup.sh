@@ -4,35 +4,28 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-echo "==> Installing Node dependencies"
-npm run install:all
+echo "==> Starting PostgreSQL (Docker)"
+docker compose up -d postgres
 
-echo "==> Setting up Python backend"
-npm run setup:backend
+echo "==> Installing dependencies"
+npm install
 
-if [[ ! -f backend/.env ]]; then
-  cp backend/.env.example backend/.env
-  echo "==> Created backend/.env from example"
-else
-  echo "==> backend/.env already exists (skipped)"
+if [[ ! -f .env ]]; then
+  cp .env.example .env
+  echo "Created .env from .env.example"
 fi
 
-if [[ ! -f frontend/.env ]]; then
-  cp frontend/.env.example frontend/.env
-  echo "==> Created frontend/.env from example"
-else
-  echo "==> frontend/.env already exists (skipped)"
-fi
+echo "==> Waiting for Postgres..."
+sleep 3
 
-mkdir -p backend/data
+echo "==> Running migrations"
+npm run db:migrate -- --skip-seed 2>/dev/null || npx prisma migrate deploy
+
+echo "==> Seeding admin user"
+npm run db:seed
 
 echo ""
-echo "Setup complete. Start the app:"
-echo "  npm run dev"
-echo ""
-echo "Admin login: http://localhost:5173/admin/login"
-echo "  company: acme  email: admin@typingrace.local  password: changeme"
-echo ""
-echo "Optional Redis (leaderboard pub/sub):"
-echo "  docker compose up -d redis"
-echo "  Then set REDIS_URL=redis://127.0.0.1:6379/0 in backend/.env"
+echo "Setup complete. Run: npm run dev"
+echo "  Player: http://localhost:3000"
+echo "  Admin:  http://localhost:3000/admin/login"
+echo "  Login:  acme / admin@typingrace.local / changeme"

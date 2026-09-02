@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EventStatus {
+  draft
+  scheduled
+  lobby_open
+  in_progress
+  finished
+  archived
+  cancelled
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  admins    AdminUser[]
+  events    ManagedEvent[]
+  auditLogs AuditEvent[]
+
+  @@map("companies")
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  companyId    String   @map("company_id")
+  email        String
+  passwordHash String   @map("password_hash")
+  role         String   @default("company_admin")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  company  Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  sessions AdminSession[]
+
+  @@unique([companyId, email])
+  @@map("admin_users")
+}
+
+model AdminSession {
+  id        String    @id @default(cuid())
+  userId    String    @map("user_id")
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+
+  user AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("admin_sessions")
+}
+
+model ManagedEvent {
+  id            String      @id @default(cuid())
+  companyId     String      @map("company_id")
+  name          String
+  description   String      @default("")
+  joinCode      String      @unique @map("join_code")
+  roomId        String      @map("room_id")
+  status        EventStatus @default(scheduled)
+  startsAt      DateTime?   @map("starts_at")
+  endsAt        DateTime?   @map("ends_at")
+  timezone      String      @default("UTC")
+  maxPlayers    Int         @default(500) @map("max_players")
+  textLineCount Int         @default(1) @map("text_line_count")
+  relayMode     Boolean     @default(false) @map("relay_mode")
+  themePrimary  String      @default("#7c3aed") @map("theme_primary")
+  publicWall    Boolean     @default(false) @map("public_wall")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  company  Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  sessions TrainingSession[]
+
+  @@index([companyId])
+  @@map("managed_events")
+}
+
+model TrainingSession {
+  id             String   @id @default(cuid())
+  managedEventId String?  @map("managed_event_id")
+  roomId         String?  @map("room_id")
+  userLabel      String?  @map("user_label")
+  teamId         Int?     @map("team_id")
+  finalWpm       Float    @default(0) @map("final_wpm")
+  accuracy       Float    @default(0)
+  progress       Float    @default(0)
+  durationS      Float    @default(0) @map("duration_s")
+  wpmHistory     Json     @default("[]") @map("wpm_history")
+  replay         Json     @default("[]")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  event ManagedEvent? @relation(fields: [managedEventId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt(sort: Desc)])
+  @@map("training_sessions")
+}
+
+model AuditEvent {
+  id        String   @id @default(cuid())
+  companyId String?  @map("company_id")
+  type      String
+  actor     String
+  meta      Json     @default("{}")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_events")
+}
